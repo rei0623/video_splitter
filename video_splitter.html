@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>多機能動画分割ツール v2.6 (ショートカット&スクロール対応)</title>
+<title data-lang-key="pageTitle">多機能動画分割ツール v2.6 (ショートカット&スクロール対応)</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="languages.js"></script>
 <style>
     body { font-family: sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f0f2f5; color: #333; display: flex; flex-direction: column; align-items: center; }
     .container { max-width: 800px; width: 100%; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -97,9 +98,16 @@
 <body>
 
 <div class="container">
-    <h1>多機能動画分割ツール v2.2</h1>
+    <div class="language-selector-container" style="margin-bottom: 15px; text-align: right;">
+      <label for="languageSelector" data-lang-key="languageSelectorLabel">言語 (Language):</label>
+      <select id="languageSelector" style="width: auto; padding: 5px;">
+        <option value="ja" data-lang-key="langOptionJapanese">日本語</option>
+        <option value="en" data-lang-key="langOptionEnglish">English</option>
+      </select>
+    </div>
+    <h1 data-lang-key="mainHeading">多機能動画分割ツール v2.2</h1>
 
-    <div id="fileDropArea" class="file-drop-area">
+    <div id="fileDropArea" class="file-drop-area" data-lang-key="fileDropAreaText">
         ここに動画/音声ファイルをドラッグ＆ドロップ、またはクリックして選択
     </div>
     <input type="file" id="videoFileInput" accept="video/*,audio/*" style="display: none;">
@@ -107,8 +115,8 @@
     <div id="sourceVideoContainer">
         <video id="sourceVideo" playsinline muted></video>
         <div id="customControls" style="display:none;">
-             <button id="playPauseBtn" title="再生/一時停止 (Space)">再生</button>
-             <input type="range" id="seekBar" value="0" style="flex-grow:1; margin:0 10px; display:none;" title="シークバー">
+             <button id="playPauseBtn" data-lang-key="playButton" data-lang-title-key="playPauseButtonTitle" title="再生/一時停止 (Space)">再生</button>
+             <input type="range" id="seekBar" value="0" style="flex-grow:1; margin:0 10px; display:none;" data-lang-title-key="seekBarTitle" title="シークバー">
              <span id="currentTimeDisplay">0:00.000</span> /
              <span id="durationDisplay">0:00.000</span>
         </div>
@@ -120,74 +128,137 @@
 
 
     <div class="tabs">
-        <button class="tab-button active" data-tab="sequentialModeTab" title="逐次分割モード">逐次分割</button>
-        <button class="tab-button" data-tab="freeModeTab" title="自由区間指定モード">自由区間指定</button>
-        <button class="tab-button" data-tab="fixedLengthModeTab" title="固定長分割モード">固定長分割</button>
+        <button class="tab-button active" data-tab="sequentialModeTab" data-lang-key="sequentialModeTabCaption" data-lang-title-key="sequentialModeTabTitle" title="逐次分割モード">逐次分割</button>
+        <button class="tab-button" data-tab="freeModeTab" data-lang-key="freeModeTabCaption" data-lang-title-key="freeModeTabTitle" title="自由区間指定モード">自由区間指定</button>
+        <button class="tab-button" data-tab="fixedLengthModeTab" data-lang-key="fixedLengthModeTabCaption" data-lang-title-key="fixedLengthModeTabTitle" title="固定長分割モード">固定長分割</button>
     </div>
 
     <div id="sequentialModeTab" class="tab-content active mode-section">
-        <h3>逐次分割モード</h3>
-        <p>動画を再生し、区切りたい位置で下のボタンを押すか <kbd>M</kbd> キーを押してください。</p>
-        <button id="markSequentialSplitPointButton" disabled title="現在の位置で分割点をマーク (M)">現在の位置で分割点をマーク</button>
+        <h3 data-lang-key="sequentialModeHeading">逐次分割モード</h3>
+        <p data-lang-key="sequentialModeDescription">動画を再生し、区切りたい位置で下のボタンを押すか <kbd>M</kbd> キーを押してください。</p>
+        <button id="markSequentialSplitPointButton" disabled data-lang-key="markSequentialSplitPointButtonCaption" data-lang-title-key="markSequentialSplitPointButtonTitle" title="現在の位置で分割点をマーク (M)">現在の位置で分割点をマーク</button>
     </div>
 
     <div id="freeModeTab" class="tab-content mode-section">
-        <h3>自由区間指定モード</h3>
-        <p>下のボタンで新規区間を追加するか <kbd>N</kbd> キーを押し、開始/終了時間を編集してください。</p>
-        <button id="addFreeSegmentButton" disabled title="新規区間を追加 (N)">新規区間を追加</button>
+        <h3 data-lang-key="freeModeHeading">自由区間指定モード</h3>
+        <p data-lang-key="freeModeDescription">下のボタンで新規区間を追加するか <kbd>N</kbd> キーを押し、開始/終了時間を編集してください。</p>
+        <button id="addFreeSegmentButton" disabled data-lang-key="addFreeSegmentButtonCaption" data-lang-title-key="addFreeSegmentButtonTitle" title="新規区間を追加 (N)">新規区間を追加</button>
     </div>
 
     <div id="fixedLengthModeTab" class="tab-content mode-section">
-        <h3>固定長分割モード</h3>
+        <h3 data-lang-key="fixedLengthModeHeading">固定長分割モード</h3>
         <div class="input-group">
-            <label for="fixedSegmentLengthInput">セグメント長 (秒):</label>
+            <label for="fixedSegmentLengthInput" data-lang-key="fixedSegmentLengthLabel">セグメント長 (秒):</label>
             <input type="number" id="fixedSegmentLengthInput" value="30" min="0.1" step="0.1">
         </div>
         <div class="input-group">
-            <label for="fixedStartOffsetInput">開始オフセット (秒):</label>
+            <label for="fixedStartOffsetInput" data-lang-key="fixedStartOffsetLabel">開始オフセット (秒):</label>
             <input type="number" id="fixedStartOffsetInput" value="0" min="0" step="0.1">
         </div>
-        <button id="previewFixedLengthSegmentsButton" disabled>固定長セグメントをマーク</button>
+        <button id="previewFixedLengthSegmentsButton" disabled data-lang-key="previewFixedLengthSegmentsButtonCaption">固定長セグメントをマーク</button>
     </div>
 
 
     <div class="options-section">
-        <h3>共通設定</h3>
+        <h3 data-lang-key="commonSettingsHeading">共通設定</h3>
         <div class="input-group">
-            <label for="fileNamePrefixInput">ファイル名プレフィックス:</label>
+            <label for="fileNamePrefixInput" data-lang-key="fileNamePrefixLabel">ファイル名プレフィックス:</label>
             <input type="text" id="fileNamePrefixInput" value="segment">
         </div>
         <label class="checkbox-label">
-            <input type="checkbox" id="audioOnlyModeCheckbox" title="音声のみ抽出 (O)"> 音声のみを抽出・分割する
+            <input type="checkbox" id="audioOnlyModeCheckbox" data-lang-title-key="audioOnlyModeCheckboxTitle" title="音声のみ抽出 (O)"> <span data-lang-key="audioOnlyModeCheckboxLabel">音声のみを抽出・分割する</span>
         </label>
     </div>
 
     <div id="segmentsListContainer">
-        <h3>マーク済みセグメントリスト</h3>
+        <h3 data-lang-key="markedSegmentsListHeading">マーク済みセグメントリスト</h3>
         <div id="markedSegmentsListDiv">
             </div>
     </div>
 
-    <button id="generateAllMarkedButton" style="display: none; background-color: #28a745; margin-top:10px;" title="マーク済の未生成セグメントを全て生成">マーク済全セグメントを生成</button>
-    <button id="downloadAllGeneratedButton" style="display: none; background-color: #17a2b8;" title="生成済の全セグメントをZIPでダウンロード">生成済全セグメントをZIPでダウンロード</button>
-    <button id="cancelCurrentOperationButton" style="display: none; background-color: #dc3545;" title="現在の生成/圧縮処理をキャンセル (Esc)">現在の操作をキャンセル</button>
+    <button id="generateAllMarkedButton" style="display: none; background-color: #28a745; margin-top:10px;" data-lang-key="generateAllMarkedButtonCaption" data-lang-title-key="generateAllMarkedButtonTitle" title="マーク済の未生成セグメントを全て生成">マーク済全セグメントを生成</button>
+    <button id="downloadAllGeneratedButton" style="display: none; background-color: #17a2b8;" data-lang-key="downloadAllGeneratedButtonCaption" data-lang-title-key="downloadAllGeneratedButtonTitle" title="生成済の全セグメントをZIPでダウンロード">生成済全セグメントをZIPでダウンロード</button>
+    <button id="cancelCurrentOperationButton" style="display: none; background-color: #dc3545;" data-lang-key="cancelCurrentOperationButtonCaption" data-lang-title-key="cancelCurrentOperationButtonTitle" title="現在の生成/圧縮処理をキャンセル (Esc)">現在の操作をキャンセル</button>
 
-    <div id="statusArea">ステータス: 動画ファイルを選択してください。</div>
+    <div id="statusArea" data-lang-key="statusInitial">ステータス: 動画ファイルを選択してください。</div>
     <div id="progressBarContainer">
         <div id="progressBar">0%</div>
     </div>
 
     <div class="project-management">
-        <button id="exportSegmentsButton" disabled title="現在の区間情報をファイルに保存 (Cmd/Ctrl + S)">区間情報をエクスポート</button>
-        <label for="importSegmentsInput" class="button-like-label" style="flex:1;" title="区間情報ファイルを読み込む (Cmd/Ctrl + O)">
+        <button id="exportSegmentsButton" disabled data-lang-key="exportSegmentsButtonCaption" data-lang-title-key="exportSegmentsButtonTitle" title="現在の区間情報をファイルに保存 (Cmd/Ctrl + S)">区間情報をエクスポート</button>
+        <label for="importSegmentsInput" class="button-like-label" style="flex:1;" data-lang-key="importSegmentsLabelCaption" data-lang-title-key="importSegmentsLabelTitle" title="区間情報ファイルを読み込む (Cmd/Ctrl + O)">
             区間情報をインポート
         </label>
         <input type="file" id="importSegmentsInput" accept=".json" style="display:none;">
     </div>
-    <p class="shortcut-help">ショートカット: Space (再生/一時停止), M (逐次マーク), N (新規区間), Esc (キャンセル)</p>
+    <p class="shortcut-help" data-lang-key="shortcutHelpText">ショートカット: Space (再生/一時停止), M (逐次マーク), N (新規区間), Esc (キャンセル)</p>
 </div>
 
 <script>
+    // --- Language Settings ---
+    let currentLanguage = localStorage.getItem('videoSplitterV2_language') || 'ja';
+
+    function getString(key, replacements) {
+        let langObject = uiStrings[currentLanguage] || uiStrings['en']; // Fallback to English if current lang not found
+        if (!uiStrings[currentLanguage] && currentLanguage !== 'en') {
+            console.warn(`Language '${currentLanguage}' not found in uiStrings. Falling back to English.`);
+        }
+
+        let str = langObject ? langObject[key] : null;
+
+        if (str === null || str === undefined) {
+            // Fallback to English if key not found in current language's object
+            if (currentLanguage !== 'en' && uiStrings['en']) {
+                str = uiStrings['en'][key];
+                if (str !== null && str !== undefined) {
+                    console.warn(`Key '${key}' not found in language '${currentLanguage}'. Using English fallback.`);
+                }
+            }
+        }
+
+        if (str === null || str === undefined) {
+            console.warn(`getString: Key '${key}' not found for language '${currentLanguage}' and no English fallback.`);
+            return `[${key}]`; // Return key itself or a default missing string message
+        }
+
+        if (replacements) {
+            for (const placeholder in replacements) {
+                str = str.replace(`%${placeholder}%`, replacements[placeholder]);
+            }
+        }
+        return str;
+    }
+
+    function applyLanguage() {
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.dataset.langKey;
+            const translatedText = getString(key);
+            // For elements like <p> that might contain <kbd>, we need to set innerHTML
+            if (el.querySelector('kbd')) {
+                 // Preserve kbd, replace only text nodes around it if complex, or simplify if text is only one node
+                 // For simplicity now, if KBD is present, we assume the key refers to the full HTML content.
+                 // A more robust solution might involve replacing only text nodes.
+                 el.innerHTML = translatedText;
+            } else {
+                el.textContent = translatedText;
+            }
+        });
+        document.querySelectorAll('[data-lang-title-key]').forEach(el => {
+            el.title = getString(el.dataset.langTitleKey);
+        });
+        // Update dynamic elements that are set once on load and might not be covered by other functions
+        // For example, initial button texts if not handled by play/pause state changes immediately
+        if (playPauseBtn) playPauseBtn.textContent = sourceVideo.paused || sourceVideo.ended ? getString('playButton') : getString('pauseButton');
+
+        // Update status area if it's in its initial state
+        if (statusArea && statusArea.dataset.langKey === 'statusInitial' && !videoFile) {
+            statusArea.textContent = getString('statusInitial');
+        }
+        // Potentially update other elements like progress bar text if it's static initially.
+        // progressBar.textContent = getString('progressBarInitialText', { percentage: 0 }); // If you add such a key
+    }
+
     // --- DOM Element References (Enhanced) ---
     // ... (Most DOM references are the same as previous v2.1) ...
     const videoFileInput = document.getElementById('videoFileInput');
@@ -228,6 +299,7 @@
 
     const exportSegmentsButton = document.getElementById('exportSegmentsButton');
     const importSegmentsInput = document.getElementById('importSegmentsInput');
+    const languageSelector = document.getElementById('languageSelector');
 
 
     // --- Global State ---
@@ -260,8 +332,11 @@
         localStorage.setItem('videoSplitterV2_currentSplitMode', currentSplitMode);
         localStorage.setItem('videoSplitterV2_fixedSegmentLength', fixedSegmentLengthInput.value);
         localStorage.setItem('videoSplitterV2_fixedStartOffset', fixedStartOffsetInput.value);
+        localStorage.setItem('videoSplitterV2_language', currentLanguage); // Save language
     }
     function loadAppSettings() { /* ... (unchanged) ... */
+        currentLanguage = localStorage.getItem('videoSplitterV2_language') || 'ja'; // Load language
+        languageSelector.value = currentLanguage; // Set selector value
         fileNamePrefixInput.value = localStorage.getItem('videoSplitterV2_fileNamePrefix') || 'segment';
         audioOnlyModeCheckbox.checked = localStorage.getItem('videoSplitterV2_audioOnlyMode') === 'true';
         fixedSegmentLengthInput.value = localStorage.getItem('videoSplitterV2_fixedSegmentLength') || '30';
@@ -270,10 +345,34 @@
         if (savedMode) setActiveTab(savedMode, false);
         else setActiveTab('sequentialModeTab', false); // Default if nothing saved
 
+        applyLanguage(); // Apply language after settings are loaded
+
         fileNamePrefixInput.addEventListener('change', saveAppSettings);
         audioOnlyModeCheckbox.addEventListener('change', saveAppSettings);
         fixedSegmentLengthInput.addEventListener('change', saveAppSettings);
         fixedStartOffsetInput.addEventListener('change', saveAppSettings);
+        languageSelector.addEventListener('change', (event) => {
+            currentLanguage = event.target.value;
+            saveAppSettings();
+            applyLanguage();
+            // Re-render dynamic parts
+            renderMarkedSegmentsList();
+            renderTimelineMarkers();
+            // If a video is loaded, update status messages that depend on file info
+            if (videoFile) {
+                 fileDropArea.textContent = getString('statusSelectedFile', { fileName: videoFile.name });
+                 if (videoDuration > 0) {
+                    statusArea.textContent = getString('statusVideoLoaded', { fileName: videoFile.name, duration: formatTime(videoDuration) });
+                 }
+            } else {
+                statusArea.textContent = getString('statusInitial');
+                fileDropArea.textContent = getString('fileDropAreaText');
+            }
+            // Update play/pause button text based on current state
+            if (sourceVideo && playPauseBtn) {
+                playPauseBtn.textContent = sourceVideo.paused || sourceVideo.ended ? getString('playButton') : getString('pauseButton');
+            }
+        });
     }
     window.addEventListener('load', loadAppSettings);
 
@@ -288,28 +387,50 @@
         cleanupBeforeNewFile();
         if (videoFile) {
             originalMimeType = videoFile.type;
-            fileDropArea.textContent = `選択中のファイル: ${videoFile.name}`;
+            fileDropArea.textContent = getString('statusSelectedFile', { fileName: videoFile.name });
             const mediaURL = URL.createObjectURL(videoFile); allObjectUrls.push(mediaURL);
             sourceVideo.src = mediaURL; sourceVideo.style.display = 'block';
             customControls.style.display = 'flex'; timelineContainer.style.display = 'block'; seekBar.style.display = 'block';
             sourceVideo.onloadedmetadata = () => {
                 videoDuration = sourceVideo.duration; durationDisplay.textContent = formatTime(videoDuration); seekBar.max = videoDuration;
                 updateUIForFileLoaded();
-                statusArea.textContent = `動画読み込み完了: ${videoFile.name} (${formatTime(videoDuration)})。分割モードを選択し、操作を開始してください。`;
+                statusArea.textContent = getString('statusVideoLoaded', { fileName: videoFile.name, duration: formatTime(videoDuration) });
                 statusArea.style.color = '#333'; renderTimelineMarkers();
             };
-            sourceVideo.onerror = () => { statusArea.textContent = 'エラー: 動画ファイルの読み込みに失敗。'; statusArea.style.color = 'red'; disableCoreFunctionality(); sourceVideo.style.display = 'none'; customControls.style.display = 'none'; timelineContainer.style.display = 'none'; seekBar.style.display = 'none'; fileDropArea.textContent = 'ここに動画/音声ファイルをドラッグ＆ドロップ、またはクリックして選択'; };
+            sourceVideo.onerror = () => {
+                statusArea.textContent = getString('errorVideoLoadFailed');
+                statusArea.style.color = 'red';
+                disableCoreFunctionality();
+                sourceVideo.style.display = 'none';
+                customControls.style.display = 'none';
+                timelineContainer.style.display = 'none';
+                seekBar.style.display = 'none';
+                fileDropArea.textContent = getString('fileDropAreaText');
+            };
             sourceVideo.ontimeupdate = () => { currentTimeDisplay.textContent = formatTime(sourceVideo.currentTime); if (!isSeekBarDragging) seekBar.value = sourceVideo.currentTime; updateTimelineProgress(); };
-            sourceVideo.onplay = () => playPauseBtn.textContent = '一時停止';
-            sourceVideo.onpause = () => playPauseBtn.textContent = '再生';
-            sourceVideo.onended = () => { playPauseBtn.textContent = '再生'; sourceVideo.currentTime = 0; seekBar.value = 0; };
-        } else { disableCoreFunctionality(); sourceVideo.style.display = 'none'; customControls.style.display = 'none'; timelineContainer.style.display = 'none'; seekBar.style.display = 'none'; statusArea.textContent = 'ステータス: 動画ファイルを選択してください。'; fileDropArea.textContent = 'ここに動画/音声ファイルをドラッグ＆ドロップ、またはクリックして選択'; }
+            sourceVideo.onplay = () => playPauseBtn.textContent = getString('pauseButton');
+            sourceVideo.onpause = () => playPauseBtn.textContent = getString('playButton');
+            sourceVideo.onended = () => { playPauseBtn.textContent = getString('playButton'); sourceVideo.currentTime = 0; seekBar.value = 0; };
+        } else {
+            disableCoreFunctionality();
+            sourceVideo.style.display = 'none';
+            customControls.style.display = 'none';
+            timelineContainer.style.display = 'none';
+            seekBar.style.display = 'none';
+            statusArea.textContent = getString('statusInitial');
+            fileDropArea.textContent = getString('fileDropAreaText');
+        }
     }
     function cleanupBeforeNewFile() { /* ... (unchanged) ... */
         allObjectUrls.forEach(url => URL.revokeObjectURL(url)); allObjectUrls = [];
         if (sourceVideo.src && sourceVideo.src.startsWith('blob:')) sourceVideo.removeAttribute('src');
         markedSegments = []; generatedBlobsForZip = []; videoDuration = 0; editingSegmentId = null;
         renderMarkedSegmentsList(); updateTimelineProgress(); renderTimelineMarkers();
+        // Reset status area to initial or file selection prompt if no file is loaded
+        if (!videoFile) {
+            statusArea.textContent = getString('statusInitial');
+            fileDropArea.textContent = getString('fileDropAreaText');
+        }
     }
     function updateUIForFileLoaded() { /* ... (unchanged) ... */ markSequentialSplitPointButton.disabled = false; addFreeSegmentButton.disabled = false; previewFixedLengthSegmentsButton.disabled = false; exportSegmentsButton.disabled = false; }
     function disableCoreFunctionality() { /* ... (unchanged) ... */ markSequentialSplitPointButton.disabled = true; addFreeSegmentButton.disabled = true; previewFixedLengthSegmentsButton.disabled = true; exportSegmentsButton.disabled = true; generateAllMarkedButton.style.display = 'none'; downloadAllGeneratedButton.style.display = 'none'; }
@@ -319,13 +440,33 @@
     seekBar.addEventListener('input', () => { isSeekBarDragging = true; currentTimeDisplay.textContent = formatTime(seekBar.value); updateTimelineProgress(parseFloat(seekBar.value)); });
     seekBar.addEventListener('change', () => { isSeekBarDragging = false; sourceVideo.currentTime = seekBar.value; });
     timelineContainer.addEventListener('click', (e) => { if (!videoDuration || e.target.classList.contains('timeline-marker')) return; const rect = timelineContainer.getBoundingClientRect(); const clickX = e.clientX - rect.left; const percentage = clickX / rect.width; sourceVideo.currentTime = videoDuration * percentage; });
-    timelineContainer.addEventListener('mousemove', (e) => { /* ... (unchanged from v2.1) ... */
-        if (!videoDuration) return; const rect = timelineContainer.getBoundingClientRect(); const hoverX = e.clientX - rect.left; const percentage = hoverX / rect.width; const hoverTime = videoDuration * percentage;
-        timelineTooltip.style.display = 'block'; timelineTooltip.style.left = `${Math.min(rect.width - timelineTooltip.offsetWidth - 5, Math.max(0, hoverX - timelineTooltip.offsetWidth / 2))}px`; // Keep tooltip within bounds
-        timelineTooltip.textContent = formatTime(hoverTime);
-        const segmentRanges = timelineContainer.querySelectorAll('.segment-range-on-timeline'); let foundSegment = false;
-        segmentRanges.forEach(rangeEl => { const segment = markedSegments.find(s => s.id === parseInt(rangeEl.dataset.segmentId)); if (segment) { const startX = (segment.startTime / videoDuration) * rect.width; const endX = (segment.endTime / videoDuration) * rect.width; if (hoverX >= startX && hoverX <= endX) { timelineTooltip.textContent = `区間 ${markedSegments.indexOf(segment) + 1}: ${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}`; rangeEl.classList.add('hovered'); foundSegment = true; } else { rangeEl.classList.remove('hovered'); } } });
-        if (!foundSegment && timelineTooltip.textContent.includes("区間")) timelineTooltip.textContent = formatTime(hoverTime);
+    timelineContainer.addEventListener('mousemove', (e) => {
+        if (!videoDuration) return;
+        const rect = timelineContainer.getBoundingClientRect();
+        const hoverX = e.clientX - rect.left;
+        const percentage = hoverX / rect.width;
+        const hoverTime = videoDuration * percentage;
+        timelineTooltip.style.display = 'block';
+        timelineTooltip.style.left = `${Math.min(rect.width - timelineTooltip.offsetWidth - 5, Math.max(0, hoverX - timelineTooltip.offsetWidth / 2))}px`;
+
+        let tooltipText = formatTime(hoverTime); // Default to current time
+        const segmentRanges = timelineContainer.querySelectorAll('.segment-range-on-timeline');
+        let foundSegment = false;
+        segmentRanges.forEach(rangeEl => {
+            const segment = markedSegments.find(s => s.id === parseInt(rangeEl.dataset.segmentId));
+            if (segment) {
+                const startX = (segment.startTime / videoDuration) * rect.width;
+                const endX = (segment.endTime / videoDuration) * rect.width;
+                if (hoverX >= startX && hoverX <= endX) {
+                    tooltipText = getString('tooltipSegmentRange', { segmentIndex: markedSegments.indexOf(segment) + 1, startTime: formatTime(segment.startTime), endTime: formatTime(segment.endTime) });
+                    rangeEl.classList.add('hovered');
+                    foundSegment = true;
+                } else {
+                    rangeEl.classList.remove('hovered');
+                }
+            }
+        });
+        timelineTooltip.textContent = tooltipText;
     });
     timelineContainer.addEventListener('mouseleave', () => { /* ... (unchanged from v2.1) ... */ timelineTooltip.style.display = 'none'; timelineContainer.querySelectorAll('.segment-range-on-timeline.hovered').forEach(el => el.classList.remove('hovered')); });
     function formatTime(timeInSeconds) { /* ... (unchanged from v2.1, already shows milliseconds) ... */
@@ -333,11 +474,41 @@
         return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
     }
     function updateTimelineProgress(currentTime = sourceVideo.currentTime) { /* ... (unchanged from v2.1) ... */ if (!videoDuration) { timelineProgress.style.width = '0%'; return; } const percentage = (currentTime / videoDuration) * 100; timelineProgress.style.width = `${percentage}%`; }
-    function renderTimelineMarkers() { /* ... (unchanged from v2.1) ... */
-        const existingElements = timelineContainer.querySelectorAll('.timeline-marker, .segment-range-on-timeline'); existingElements.forEach(el => el.remove()); if (!videoDuration) return;
-        markedSegments.forEach(segment => { const isEditingThis = segment.id === editingSegmentId; const startMarker = document.createElement('div'); startMarker.className = 'timeline-marker'; startMarker.style.left = `${(segment.startTime / videoDuration) * 100}%`; startMarker.title = `区間開始: ${formatTime(segment.startTime)}`; if (isEditingThis) startMarker.classList.add('editing-start'); else if (segment.status === 'generated') startMarker.style.backgroundColor = '#28a745'; else if (segment.status === 'failed') startMarker.style.backgroundColor = '#dc3545'; timelineContainer.appendChild(startMarker);
-        const endMarker = document.createElement('div'); endMarker.className = 'timeline-marker'; endMarker.style.left = `${(segment.endTime / videoDuration) * 100}%`; endMarker.title = `区間終了: ${formatTime(segment.endTime)}`; if (isEditingThis) endMarker.classList.add('editing-end'); else if (segment.status === 'generated') endMarker.style.backgroundColor = '#28a745'; else if (segment.status === 'failed') endMarker.style.backgroundColor = '#dc3545'; timelineContainer.appendChild(endMarker);
-        const rangeDiv = document.createElement('div'); rangeDiv.className = 'segment-range-on-timeline'; rangeDiv.dataset.segmentId = segment.id; rangeDiv.style.left = `${(segment.startTime / videoDuration) * 100}%`; rangeDiv.style.width = `${Math.max(0, (segment.endTime - segment.startTime) / videoDuration) * 100}%`; if (isEditingThis) rangeDiv.classList.add('editing'); else if (segment.status === 'generating') rangeDiv.style.backgroundColor = 'rgba(255, 193, 7, 0.4)'; else if (segment.status === 'generated') rangeDiv.style.backgroundColor = 'rgba(40, 167, 69, 0.3)'; else if (segment.status === 'failed') rangeDiv.style.backgroundColor = 'rgba(220, 53, 69, 0.3)'; timelineContainer.appendChild(rangeDiv); });
+    function renderTimelineMarkers() {
+        const existingElements = timelineContainer.querySelectorAll('.timeline-marker, .segment-range-on-timeline');
+        existingElements.forEach(el => el.remove());
+        if (!videoDuration) return;
+        markedSegments.forEach(segment => {
+            const isEditingThis = segment.id === editingSegmentId;
+            const startMarker = document.createElement('div');
+            startMarker.className = 'timeline-marker';
+            startMarker.style.left = `${(segment.startTime / videoDuration) * 100}%`;
+            startMarker.title = getString('timelineMarkerStartTimeTitle', { time: formatTime(segment.startTime) });
+            if (isEditingThis) startMarker.classList.add('editing-start');
+            else if (segment.status === 'generated') startMarker.style.backgroundColor = '#28a745';
+            else if (segment.status === 'failed') startMarker.style.backgroundColor = '#dc3545';
+            timelineContainer.appendChild(startMarker);
+
+            const endMarker = document.createElement('div');
+            endMarker.className = 'timeline-marker';
+            endMarker.style.left = `${(segment.endTime / videoDuration) * 100}%`;
+            endMarker.title = getString('timelineMarkerEndTimeTitle', { time: formatTime(segment.endTime) });
+            if (isEditingThis) endMarker.classList.add('editing-end');
+            else if (segment.status === 'generated') endMarker.style.backgroundColor = '#28a745';
+            else if (segment.status === 'failed') endMarker.style.backgroundColor = '#dc3545';
+            timelineContainer.appendChild(endMarker);
+
+            const rangeDiv = document.createElement('div');
+            rangeDiv.className = 'segment-range-on-timeline';
+            rangeDiv.dataset.segmentId = segment.id;
+            rangeDiv.style.left = `${(segment.startTime / videoDuration) * 100}%`;
+            rangeDiv.style.width = `${Math.max(0, (segment.endTime - segment.startTime) / videoDuration) * 100}%`;
+            if (isEditingThis) rangeDiv.classList.add('editing');
+            else if (segment.status === 'generating') rangeDiv.style.backgroundColor = 'rgba(255, 193, 7, 0.4)';
+            else if (segment.status === 'generated') rangeDiv.style.backgroundColor = 'rgba(40, 167, 69, 0.3)';
+            else if (segment.status === 'failed') rangeDiv.style.backgroundColor = 'rgba(220, 53, 69, 0.3)';
+            timelineContainer.appendChild(rangeDiv);
+        });
     }
 
     // --- Tab/Mode Switching Logic (Mostly unchanged from v2.1) ---
@@ -345,97 +516,257 @@
     function setActiveTab(tabId, doSaveSettings = true) { /* ... (unchanged from v2.1) ... */ tabs.forEach(t => t.classList.remove('active')); tabContents.forEach(tc => tc.classList.remove('active')); const activeTabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`); const activeTabContent = document.getElementById(tabId); if (activeTabButton) activeTabButton.classList.add('active'); if (activeTabContent) activeTabContent.classList.add('active'); currentSplitMode = tabId; if(doSaveSettings) saveAppSettings(); }
 
     // --- Segment Management Core (Mostly unchanged from v2.1) ---
-    function addOrUpdateSegment(segmentData, isNew = true) { /* ... (unchanged from v2.1) ... */
-        let { id, startTime, endTime } = segmentData; startTime = parseFloat(startTime); endTime = parseFloat(endTime); let validationError = null;
-        if (isNaN(startTime) || isNaN(endTime)) validationError = "開始/終了時間が無効な数値です。";
-        else if (endTime <= startTime) validationError = `終了時間 (${formatTime(endTime)}) は開始時間 (${formatTime(startTime)}) より後にしてください。`;
-        else if (startTime < 0) validationError = "開始時間は0秒以上にしてください。";
-        else if (endTime > videoDuration + 0.01) validationError = `終了時間が動画の総長 (${formatTime(videoDuration)}) を超えています。`;
-        if (validationError) { statusArea.textContent = `エラー: ${validationError}`; statusArea.style.color = 'orange'; if (id && currentSplitMode === 'freeModeTab') { const itemDiv = markedSegmentsListDiv.querySelector(`.segment-item[data-segment-id="${id}"]`); if (itemDiv) { const startInputEl = itemDiv.querySelector('input[data-time-type="start"]'); const endInputEl = itemDiv.querySelector('input[data-time-type="end"]'); if (endTime <= startTime || startTime < 0) startInputEl?.classList.add('invalid-input'); else startInputEl?.classList.remove('invalid-input'); if (endTime <= startTime || endTime > videoDuration + 0.01) endInputEl?.classList.add('invalid-input'); else endInputEl?.classList.remove('invalid-input'); } } return false; }
+    function addOrUpdateSegment(segmentData, isNew = true) {
+        let { id, startTime, endTime } = segmentData;
+        startTime = parseFloat(startTime);
+        endTime = parseFloat(endTime);
+        let validationErrorKey = null;
+        let validationErrorParams = {};
+
+        if (isNaN(startTime) || isNaN(endTime)) {
+            validationErrorKey = 'errorInvalidStartEndTimes';
+        } else if (endTime <= startTime) {
+            validationErrorKey = 'errorEndTimeBeforeStartTime';
+            validationErrorParams = { endTime: formatTime(endTime), startTime: formatTime(startTime) };
+        } else if (startTime < 0) {
+            validationErrorKey = 'errorStartTimeNegative';
+        } else if (endTime > videoDuration + 0.01) { // Allow small tolerance
+            validationErrorKey = 'errorEndTimeExceedsDuration';
+            validationErrorParams = { duration: formatTime(videoDuration) };
+        }
+
+        if (validationErrorKey) {
+            statusArea.textContent = getString('statusErrorPrefix', { error: getString(validationErrorKey, validationErrorParams) });
+            statusArea.style.color = 'orange';
+            if (id && currentSplitMode === 'freeModeTab') {
+                const itemDiv = markedSegmentsListDiv.querySelector(`.segment-item[data-segment-id="${id}"]`);
+                if (itemDiv) {
+                    const startInputEl = itemDiv.querySelector('input[data-time-type="start"]');
+                    const endInputEl = itemDiv.querySelector('input[data-time-type="end"]');
+                    if (endTime <= startTime || startTime < 0) startInputEl?.classList.add('invalid-input'); else startInputEl?.classList.remove('invalid-input');
+                    if (endTime <= startTime || endTime > videoDuration + 0.01) endInputEl?.classList.add('invalid-input'); else endInputEl?.classList.remove('invalid-input');
+                }
+            }
+            return false;
+        }
+
         if (isNew) { const newSegment = { id: Date.now(), startTime, endTime, status: 'marked', isEditing: false, blob: null, fileName: '', blobUrl: null }; markedSegments.push(newSegment); id = newSegment.id; }
         else { const index = markedSegments.findIndex(s => s.id === id); if (index > -1) { if (markedSegments[index].startTime !== startTime || markedSegments[index].endTime !== endTime) { if (markedSegments[index].blobUrl) URL.revokeObjectURL(markedSegments[index].blobUrl); allObjectUrls = allObjectUrls.filter(url => url !== markedSegments[index].blobUrl); generatedBlobsForZip = generatedBlobsForZip.filter(gb => gb.name !== markedSegments[index].fileName); markedSegments[index].blob = null; markedSegments[index].blobUrl = null; markedSegments[index].fileName = ''; markedSegments[index].status = 'marked'; } markedSegments[index] = { ...markedSegments[index], startTime, endTime, isEditing: false }; if (id === editingSegmentId) editingSegmentId = null; } else { return false; } }
-        markedSegments.sort((a, b) => a.startTime - b.startTime); renderMarkedSegmentsList(); renderTimelineMarkers(); updateGlobalActionButtons(); statusArea.textContent = `セグメント (${formatTime(startTime)} - ${formatTime(endTime)}) を${isNew ? '追加' : '更新'}しました。`; statusArea.style.color = '#333'; return true;
+        markedSegments.sort((a, b) => a.startTime - b.startTime);
+        renderMarkedSegmentsList();
+        renderTimelineMarkers();
+        updateGlobalActionButtons();
+        statusArea.textContent = getString(isNew ? 'statusSegmentAdded' : 'statusSegmentUpdated', { startTime: formatTime(startTime), endTime: formatTime(endTime) });
+        statusArea.style.color = '#333';
+        return true;
     }
     function removeSegmentById(segmentId) { /* ... (unchanged from v2.1) ... */
         const segmentIndex = markedSegments.findIndex(s => s.id === segmentId); if (segmentIndex === -1) return; const segmentToRemove = markedSegments[segmentIndex];
         if (segmentToRemove.blobUrl) URL.revokeObjectURL(segmentToRemove.blobUrl); allObjectUrls = allObjectUrls.filter(url => url !== segmentToRemove.blobUrl); generatedBlobsForZip = generatedBlobsForZip.filter(gb => gb.name !== segmentToRemove.fileName); if (editingSegmentId === segmentId) editingSegmentId = null;
         markedSegments.splice(segmentIndex, 1);
         if (currentSplitMode === 'sequentialModeTab' && markedSegments.length > 0 && segmentIndex < markedSegments.length) { for (let i = segmentIndex; i < markedSegments.length; i++) { markedSegments[i].startTime = (i > 0) ? markedSegments[i-1].endTime : 0; } }
-        renderMarkedSegmentsList(); renderTimelineMarkers(); updateGlobalActionButtons(); statusArea.textContent = "セグメントを削除しました。"; if (markedSegments.length === 0) statusArea.textContent = "全てのセグメントが削除されました。";
+        renderMarkedSegmentsList();
+        renderTimelineMarkers();
+        updateGlobalActionButtons();
+        statusArea.textContent = getString(markedSegments.length === 0 ? 'statusAllSegmentsDeleted' : 'statusSegmentDeleted');
     }
 
     // --- Auto-scroll and Enhanced Preview ---
     function previewSegment(segmentId) {
         const segment = markedSegments.find(s => s.id === segmentId);
         if (segment && sourceVideo.readyState >= 1) {
-            // NEW: Auto-scroll to video player
             sourceVideoContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
             sourceVideo.currentTime = segment.startTime;
             sourceVideo.play();
-            statusArea.textContent = `区間プレビュー中: ${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}`;
+            statusArea.textContent = getString('statusPreviewingSegment', { startTime: formatTime(segment.startTime), endTime: formatTime(segment.endTime) });
 
-            if (previewStopTimeout) clearTimeout(previewStopTimeout); // Clear previous timeout
+            if (previewStopTimeout) clearTimeout(previewStopTimeout);
             previewStopTimeout = setTimeout(() => {
-                if (sourceVideo.currentTime >= segment.endTime || sourceVideo.paused && sourceVideo.currentTime < segment.endTime) { // Check if still in preview range and paused by this logic
+                if (sourceVideo.currentTime >= segment.endTime || (sourceVideo.paused && sourceVideo.currentTime < segment.endTime)) {
                     sourceVideo.pause();
-                    // Optionally reset to start of segment: sourceVideo.currentTime = segment.startTime;
                 }
-            }, (segment.endTime - segment.startTime + 0.1) * 1000); // Stop a bit after segment ends
+            }, (segment.endTime - segment.startTime + 0.1) * 1000);
         }
     }
 
 
     // --- Mode-Specific Button Handlers (Enhanced Fixed Length) ---
-    markSequentialSplitPointButton.addEventListener('click', () => { /* ... (unchanged from v2.1) ... */
-        if (!videoFile || videoDuration <= 0) return; const currentTime = sourceVideo.currentTime; let newStartTime = 0;
-        if (markedSegments.length > 0) { const lastSegment = markedSegments.reduce((latest, s) => (s.endTime > (latest?.endTime || 0) ? s : latest), null); if (lastSegment) newStartTime = lastSegment.endTime; }
-        if (currentTime <= newStartTime + 0.001) { statusArea.textContent = `新しい分割点は前の分割点の終了 (${formatTime(newStartTime)}) より後にしてください。`; statusArea.style.color = 'orange'; return; }
+    markSequentialSplitPointButton.addEventListener('click', () => {
+        if (!videoFile || videoDuration <= 0) return;
+        const currentTime = sourceVideo.currentTime;
+        let newStartTime = 0;
+        if (markedSegments.length > 0) {
+            const lastSegment = markedSegments.reduce((latest, s) => (s.endTime > (latest?.endTime || 0) ? s : latest), null);
+            if (lastSegment) newStartTime = lastSegment.endTime;
+        }
+        if (currentTime <= newStartTime + 0.001) {
+            statusArea.textContent = getString('errorSplitPointTooEarly', { time: formatTime(newStartTime) });
+            statusArea.style.color = 'orange';
+            return;
+        }
         addOrUpdateSegment({ startTime: newStartTime, endTime: currentTime });
     });
-    addFreeSegmentButton.addEventListener('click', () => { /* ... (unchanged from v2.1) ... */
-        if (!videoFile || videoDuration <= 0) return; const defaultStartTime = sourceVideo.currentTime; const defaultEndTime = Math.min(defaultStartTime + 10, videoDuration); const tempId = Date.now();
-        if (addOrUpdateSegment({ id: tempId, startTime: defaultStartTime, endTime: defaultEndTime }, true)) { const addedSegment = markedSegments.find(s => s.startTime === defaultStartTime && s.endTime === defaultEndTime && s.status === 'marked'); if (addedSegment) toggleSegmentEdit(addedSegment.id, true); }
+    addFreeSegmentButton.addEventListener('click', () => {
+        if (!videoFile || videoDuration <= 0) return;
+        const defaultStartTime = sourceVideo.currentTime;
+        const defaultEndTime = Math.min(defaultStartTime + 10, videoDuration);
+        const tempId = Date.now();
+        if (addOrUpdateSegment({ id: tempId, startTime: defaultStartTime, endTime: defaultEndTime }, true)) {
+            const addedSegment = markedSegments.find(s => s.startTime === defaultStartTime && s.endTime === defaultEndTime && s.status === 'marked');
+            if (addedSegment) toggleSegmentEdit(addedSegment.id, true);
+        }
     });
-    previewFixedLengthSegmentsButton.addEventListener('click', () => { /* ... (Enhanced with Offset from v2.1) ... */
-        if (!videoFile || videoDuration <= 0) return; const length = parseFloat(fixedSegmentLengthInput.value); const offset = parseFloat(fixedStartOffsetInput.value);
-        if (isNaN(length) || length <= 0) { statusArea.textContent = "固定長セグメントの長さは正の数値で指定してください。"; statusArea.style.color = 'orange'; return; }
-        if (isNaN(offset) || offset < 0) { statusArea.textContent = "開始オフセットは0以上の数値で指定してください。"; statusArea.style.color = 'orange'; return; }
-        if (offset >= videoDuration) { statusArea.textContent = "開始オフセットが動画の長さを超えています。"; statusArea.style.color = 'orange'; return; }
-        let currentStartTime = offset; let count = 0;
-        while (currentStartTime < videoDuration) { let endTime = Math.min(currentStartTime + length, videoDuration); if (endTime - currentStartTime < 0.01 && currentStartTime > offset) break; addOrUpdateSegment({ startTime: currentStartTime, endTime: endTime, isFixedPreview: true }); currentStartTime = endTime; count++; if (currentStartTime >= videoDuration) break; }
-        statusArea.textContent = `${count}個の固定長セグメント (長さ:${length}s, オフセット:${offset}s) をマークしました。`;
+    previewFixedLengthSegmentsButton.addEventListener('click', () => {
+        if (!videoFile || videoDuration <= 0) return;
+        const length = parseFloat(fixedSegmentLengthInput.value);
+        const offset = parseFloat(fixedStartOffsetInput.value);
+        if (isNaN(length) || length <= 0) {
+            statusArea.textContent = getString('errorFixedLengthPositive');
+            statusArea.style.color = 'orange'; return;
+        }
+        if (isNaN(offset) || offset < 0) {
+            statusArea.textContent = getString('errorFixedOffsetPositive');
+            statusArea.style.color = 'orange'; return;
+        }
+        if (offset >= videoDuration) {
+            statusArea.textContent = getString('errorFixedOffsetExceedsDuration');
+            statusArea.style.color = 'orange'; return;
+        }
+        let currentStartTime = offset;
+        let count = 0;
+        // Clear existing non-generated fixed-preview segments before adding new ones
+        markedSegments = markedSegments.filter(s => !s.isFixedPreview || s.status === 'generated' || s.status === 'generating');
+
+        while (currentStartTime < videoDuration) {
+            let endTime = Math.min(currentStartTime + length, videoDuration);
+            if (endTime - currentStartTime < 0.01 && currentStartTime > offset) break;
+            addOrUpdateSegment({ startTime: currentStartTime, endTime: endTime, isFixedPreview: true });
+            currentStartTime = endTime;
+            count++;
+            if (currentStartTime >= videoDuration) break;
+        }
+        statusArea.textContent = getString('statusFixedSegmentsMarked', { count: count, length: length, offset: offset });
     });
 
 
     // --- Rendering Segment List UI (Mostly unchanged from v2.1 - validation styling handled in addOrUpdateSegment) ---
-    function renderMarkedSegmentsList() { /* ... (Mostly unchanged from v2.1, relies on helper functions for input creation and validation styling is handled elsewhere) ... */
-        markedSegmentsListDiv.innerHTML = ''; let hasGeneratedFiles = generatedBlobsForZip.some(item => item.blob && item.blob.size > 0); let hasMarkedUnGenerated = false;
-        if (markedSegments.length === 0) { const p = document.createElement('p'); p.textContent = 'マークされたセグメントはありません。'; p.style.textAlign = 'center'; p.style.color = '#777'; markedSegmentsListDiv.appendChild(p); updateGlobalActionButtons(); return; }
+    function renderMarkedSegmentsList() {
+        markedSegmentsListDiv.innerHTML = '';
+        let hasGeneratedFiles = generatedBlobsForZip.some(item => item.blob && item.blob.size > 0);
+        let hasMarkedUnGenerated = false;
+        if (markedSegments.length === 0) {
+            const p = document.createElement('p');
+            p.textContent = getString('noMarkedSegments');
+            p.style.textAlign = 'center'; p.style.color = '#777';
+            markedSegmentsListDiv.appendChild(p);
+            updateGlobalActionButtons(); return;
+        }
         markedSegments.forEach((segment, index) => {
             if (segment.status === 'marked' || segment.status === 'editing' || segment.status === 'failed' || segment.status === 'cancelled') hasMarkedUnGenerated = true;
-            const itemDiv = document.createElement('div'); itemDiv.className = 'segment-item'; itemDiv.dataset.segmentId = segment.id; if (segment.id === editingSegmentId) itemDiv.classList.add('editing-in-list');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'segment-item';
+            itemDiv.dataset.segmentId = segment.id;
+            if (segment.id === editingSegmentId) itemDiv.classList.add('editing-in-list');
+
             itemDiv.addEventListener('mouseenter', () => { const rangeEl = timelineContainer.querySelector(`.segment-range-on-timeline[data-segment-id="${segment.id}"]`); rangeEl?.classList.add('hovered'); itemDiv.classList.add('hovered-in-list'); });
             itemDiv.addEventListener('mouseleave', () => { const rangeEl = timelineContainer.querySelector(`.segment-range-on-timeline[data-segment-id="${segment.id}"]`); rangeEl?.classList.remove('hovered'); itemDiv.classList.remove('hovered-in-list'); });
+
             const mainInfoDiv = document.createElement('div'); mainInfoDiv.className = 'segment-item-main';
             const infoSpan = document.createElement('span'); infoSpan.className = 'segment-info';
             const segmentInputsDiv = document.createElement('div'); segmentInputsDiv.className = 'segment-inputs'; segmentInputsDiv.style.display = (segment.id === editingSegmentId) ? 'flex' : 'none';
-            const createTimeInput = (type, value) => { const lbl = document.createElement('label'); lbl.textContent = type === 'start' ? '始:' : '終:'; lbl.htmlFor = `segment-${segment.id}-${type}-time`; const input = document.createElement('input'); input.type = 'number'; input.id = lbl.htmlFor; input.value = parseFloat(value).toFixed(3); input.step = "0.001"; input.min="0"; if (videoDuration > 0) input.max = videoDuration.toFixed(3); input.dataset.timeType = type; input.addEventListener('input', () => { const tempStartTime = type === 'start' ? parseFloat(input.value) : parseFloat(startInput.value); const tempEndTime = type === 'end' ? parseFloat(input.value) : parseFloat(endInput.value); renderTimelineMarkersWithEdit(segment.id, tempStartTime, tempEndTime); validateTimeInputUI(input, tempStartTime, tempEndTime, type, startInput, endInput); }); return {lbl, input}; };
+
+            const createTimeInput = (type, value) => {
+                const lbl = document.createElement('label');
+                lbl.textContent = getString(type === 'start' ? 'segmentStartTimeLabelShort' : 'segmentEndTimeLabelShort');
+                lbl.htmlFor = `segment-${segment.id}-${type}-time`;
+                const input = document.createElement('input');
+                input.type = 'number'; input.id = lbl.htmlFor;
+                input.value = parseFloat(value).toFixed(3);
+                input.step = "0.001"; input.min="0";
+                if (videoDuration > 0) input.max = videoDuration.toFixed(3);
+                input.dataset.timeType = type;
+                input.addEventListener('input', () => {
+                    const tempStartTime = type === 'start' ? parseFloat(input.value) : parseFloat(startInput.value);
+                    const tempEndTime = type === 'end' ? parseFloat(input.value) : parseFloat(endInput.value);
+                    renderTimelineMarkersWithEdit(segment.id, tempStartTime, tempEndTime);
+                    validateTimeInputUI(input, tempStartTime, tempEndTime, type, startInput, endInput);
+                });
+                return {lbl, input};
+            };
             const {lbl: startLbl, input: startInput} = createTimeInput('start', segment.startTime);
             const {lbl: endLbl, input: endInput} = createTimeInput('end', segment.endTime);
-            const saveEditButton = document.createElement('button'); saveEditButton.textContent = '保存'; saveEditButton.className = 'btn-save-edit'; saveEditButton.onclick = () => addOrUpdateSegment({ ...segment, startTime: startInput.value, endTime: endInput.value }, false);
-            const cancelEditBtn = document.createElement('button'); cancelEditBtn.textContent = '中止'; cancelEditBtn.className = 'btn-secondary'; cancelEditBtn.onclick = () => toggleSegmentEdit(segment.id, false);
+
+            const saveEditButton = document.createElement('button');
+            saveEditButton.textContent = getString('saveButton');
+            saveEditButton.className = 'btn-save-edit';
+            saveEditButton.onclick = () => addOrUpdateSegment({ ...segment, startTime: startInput.value, endTime: endInput.value }, false);
+
+            const cancelEditBtn = document.createElement('button');
+            cancelEditBtn.textContent = getString('cancelButton');
+            cancelEditBtn.className = 'btn-secondary';
+            cancelEditBtn.onclick = () => toggleSegmentEdit(segment.id, false);
+
             segmentInputsDiv.append(startLbl, startInput, endLbl, endInput, saveEditButton, cancelEditBtn);
-            let statusIndicator = ''; switch (segment.status) { case 'marked': statusIndicator = `(マーク済)`; break; case 'editing': statusIndicator = `(編集中)`; break; case 'generating': statusIndicator = `(生成中...)`; break; case 'generated': statusIndicator = `(${(segment.blob?.size || 0 / 1024 / 1024).toFixed(2)} MB)`; hasGeneratedFiles = true; break; case 'failed': statusIndicator = `(生成失敗)`; break; case 'cancelled': statusIndicator = `(キャンセル済)`; break; }
-            infoSpan.textContent = `区間 ${index + 1}: ${formatTime(segment.startTime)} - ${formatTime(segment.endTime)} ${statusIndicator}`; infoSpan.style.display = (segment.id === editingSegmentId) ? 'none' : 'inline';
-            mainInfoDiv.appendChild(infoSpan); mainInfoDiv.appendChild(segmentInputsDiv);
+
+            let statusIndicatorKey = '';
+            let statusIndicatorParams = {};
+            switch (segment.status) {
+                case 'marked': statusIndicatorKey = 'segmentStatusMarked'; break;
+                case 'editing': statusIndicatorKey = 'segmentStatusEditing'; break;
+                case 'generating': statusIndicatorKey = 'segmentStatusGenerating'; break;
+                case 'generated':
+                    statusIndicatorKey = 'segmentStatusGenerated';
+                    statusIndicatorParams = { sizeMB: (segment.blob?.size || 0 / 1024 / 1024).toFixed(2) };
+                    hasGeneratedFiles = true;
+                    break;
+                case 'failed': statusIndicatorKey = 'segmentStatusFailed'; break;
+                case 'cancelled': statusIndicatorKey = 'segmentStatusCancelled'; break;
+            }
+            const statusText = statusIndicatorKey ? getString(statusIndicatorKey, statusIndicatorParams) : '';
+            infoSpan.textContent = `${getString('tooltipSegmentRange', {segmentIndex: index +1, startTime: formatTime(segment.startTime), endTime: formatTime(segment.endTime)})} ${statusText}`;
+            infoSpan.style.display = (segment.id === editingSegmentId) ? 'none' : 'inline';
+
+            mainInfoDiv.appendChild(infoSpan);
+            mainInfoDiv.appendChild(segmentInputsDiv);
+
             const actionsDiv = document.createElement('div'); actionsDiv.className = 'segment-actions';
-            const previewBtn = document.createElement('button'); previewBtn.textContent = 'プレビュー'; previewBtn.className = 'btn-preview'; previewBtn.onclick = () => previewSegment(segment.id); actionsDiv.appendChild(previewBtn);
-            if (currentSplitMode === 'freeModeTab' && (segment.status === 'marked' || segment.status === 'failed' || segment.status === 'cancelled') && segment.id !== editingSegmentId) { const editBtn = document.createElement('button'); editBtn.textContent = '時間編集'; editBtn.className = 'btn-edit'; editBtn.onclick = () => toggleSegmentEdit(segment.id, true); actionsDiv.appendChild(editBtn); }
-            if ((segment.status === 'marked' || segment.status === 'failed' || segment.status === 'cancelled') && segment.id !== editingSegmentId) { const generateBtn = document.createElement('button'); generateBtn.textContent = (segment.status === 'marked') ? 'この区間を生成' : '再生成'; generateBtn.className = 'btn-generate'; generateBtn.onclick = () => generateSingleSegment(segment.id); actionsDiv.appendChild(generateBtn); }
-            else if (segment.status === 'generated') { const downloadLink = document.createElement('a'); downloadLink.className = 'download-link'; downloadLink.href = segment.blobUrl; downloadLink.download = segment.fileName; downloadLink.textContent = 'ダウンロード'; actionsDiv.appendChild(downloadLink); }
-            const removeBtn = document.createElement('button'); removeBtn.textContent = '削除'; removeBtn.className = 'btn-danger'; removeBtn.onclick = () => removeSegmentById(segment.id); actionsDiv.appendChild(removeBtn);
-            mainInfoDiv.appendChild(actionsDiv); itemDiv.appendChild(mainInfoDiv); markedSegmentsListDiv.appendChild(itemDiv);
+            const previewBtn = document.createElement('button');
+            previewBtn.textContent = getString('previewButton');
+            previewBtn.className = 'btn-preview';
+            previewBtn.onclick = () => previewSegment(segment.id);
+            actionsDiv.appendChild(previewBtn);
+
+            if (currentSplitMode === 'freeModeTab' && (segment.status === 'marked' || segment.status === 'failed' || segment.status === 'cancelled') && segment.id !== editingSegmentId) {
+                const editBtn = document.createElement('button');
+                editBtn.textContent = getString('editTimeButton');
+                editBtn.className = 'btn-edit';
+                editBtn.onclick = () => toggleSegmentEdit(segment.id, true);
+                actionsDiv.appendChild(editBtn);
+            }
+            if ((segment.status === 'marked' || segment.status === 'failed' || segment.status === 'cancelled') && segment.id !== editingSegmentId) {
+                const generateBtn = document.createElement('button');
+                generateBtn.textContent = getString((segment.status === 'marked') ? 'generateThisSegmentButton' : 'regenerateSegmentButton');
+                generateBtn.className = 'btn-generate';
+                generateBtn.onclick = () => generateSingleSegment(segment.id);
+                actionsDiv.appendChild(generateBtn);
+            }
+            else if (segment.status === 'generated') {
+                const downloadLink = document.createElement('a');
+                downloadLink.className = 'download-link';
+                downloadLink.href = segment.blobUrl;
+                downloadLink.download = segment.fileName;
+                downloadLink.textContent = getString('downloadButton');
+                actionsDiv.appendChild(downloadLink);
+            }
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = getString('deleteButton');
+            removeBtn.className = 'btn-danger';
+            removeBtn.onclick = () => removeSegmentById(segment.id);
+            actionsDiv.appendChild(removeBtn);
+
+            mainInfoDiv.appendChild(actionsDiv);
+            itemDiv.appendChild(mainInfoDiv);
+            markedSegmentsListDiv.appendChild(itemDiv);
         });
         updateGlobalActionButtons(hasMarkedUnGenerated, hasGeneratedFiles);
     }
@@ -447,26 +778,27 @@
     }
     // UI specific validation styling for inputs
     function validateTimeInputUI(inputElement, startTime, endTime, type, startInputEl, endInputEl) {
-        let validationError = null;
-        if (isNaN(startTime) || isNaN(endTime)) validationError = "数値エラー";
-        else if (endTime <= startTime) validationError = "終了点エラー";
-        else if (startTime < 0) validationError = "開始点エラー";
-        else if (endTime > videoDuration + 0.01) validationError = "終了点超過エラー";
+        let validationErrorKey = null;
+        if (isNaN(startTime) || isNaN(endTime)) validationErrorKey = "errorInvalidStartEndTimes";
+        else if (endTime <= startTime) validationErrorKey = "errorEndTimeBeforeStartTime";
+        else if (startTime < 0) validationErrorKey = "errorStartTimeNegative";
+        else if (endTime > videoDuration + 0.01) validationErrorKey = "errorEndTimeExceedsDuration";
 
         const applyError = (el, hasError) => el?.classList.toggle('invalid-input', hasError);
 
-        if (validationError === "数値エラー") {
-            if (type === 'start' && isNaN(startTime)) applyError(startInputEl, true); else applyError(startInputEl, false);
-            if (type === 'end' && isNaN(endTime)) applyError(endInputEl, true); else applyError(endInputEl, false);
-        } else if (validationError === "終了点エラー") {
+        // Clear previous errors first
+        applyError(startInputEl, false);
+        applyError(endInputEl, false);
+
+        if (validationErrorKey === "errorInvalidStartEndTimes") {
+            if (type === 'start' && isNaN(startTime)) applyError(startInputEl, true);
+            if (type === 'end' && isNaN(endTime)) applyError(endInputEl, true);
+        } else if (validationErrorKey === "errorEndTimeBeforeStartTime") {
             applyError(startInputEl, true); applyError(endInputEl, true);
-        } else if (validationError === "開始点エラー") {
-            applyError(startInputEl, true); applyError(endInputEl, false); // Only start is definitely wrong
-        } else if (validationError === "終了点超過エラー") {
-            applyError(endInputEl, true); applyError(startInputEl, false); // Only end is definitely wrong
-        } else { // No error
-            applyError(startInputEl, false);
-            applyError(endInputEl, false);
+        } else if (validationErrorKey === "errorStartTimeNegative") {
+            applyError(startInputEl, true);
+        } else if (validationErrorKey === "errorEndTimeExceedsDuration") {
+            applyError(endInputEl, true);
         }
     }
     function toggleSegmentEdit(segmentId, forceIsEditing) { /* ... (unchanged from v2.1) ... */
@@ -484,56 +816,399 @@
 
 
     // --- Project Export/Import (Enhanced Validation from v2.1 is kept) ---
-    exportSegmentsButton.addEventListener('click', () => { /* ... (unchanged from v2.1) ... */ });
-    importSegmentsInput.addEventListener('change', (event) => { /* ... (unchanged from v2.1) ... */ });
+    exportSegmentsButton.addEventListener('click', () => {
+        if (markedSegments.length === 0) return;
+        const exportData = {
+            version: "videoSplitterV2.1-segments",
+            fileInfo: { name: videoFile?.name, type: videoFile?.type, duration: videoDuration },
+            segments: markedSegments.map(s => ({startTime: s.startTime, endTime: s.endTime, status: 'marked'})) // Don't export generated status/blobs
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+        const url = URL.createObjectURL(blob); allObjectUrls.push(url);
+        const a = document.createElement('a');
+        a.href = url;
+        const prefix = fileNamePrefixInput.value || 'segments';
+        const originalName = videoFile?.name ? videoFile.name.substring(0, videoFile.name.lastIndexOf('.')) || videoFile.name : 'video';
+        a.download = `${prefix}_${originalName}_segment_data.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        statusArea.textContent = getString('statusExported', {fileName: a.download});
+    });
+
+    importSegmentsInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.version !== "videoSplitterV2.1-segments" || !Array.isArray(data.segments)) {
+                    throw new Error(getString('errorImportFormat'));
+                }
+                if (!videoFile && data.fileInfo && data.fileInfo.duration) {
+                     // If no video is loaded, we can't fully validate times yet, but it's a hint
+                     console.log("Importing segment data without a video loaded. Duration from file: " + data.fileInfo.duration);
+                }
+                const imported = [];
+                let importErrors = 0;
+                data.segments.forEach(s => {
+                    const start = parseFloat(s.startTime); const end = parseFloat(s.endTime);
+                    if (isNaN(start) || isNaN(end) || start < 0 || end <= start || (videoDuration > 0 && end > videoDuration + 0.01) ) {
+                        console.warn(`Invalid segment time in import: Start ${s.startTime}, End ${s.endTime}`);
+                        importErrors++;
+                        return; // Skip invalid segment
+                    }
+                    addOrUpdateSegment({startTime: start, endTime: end}, true);
+                    imported.push({start,end});
+                });
+                if (importErrors > 0) {
+                    statusArea.textContent = getString('errorImportValidation') + ` (${importErrors} ${getString('segmentsSkipped') || 'segments skipped'})`; // Add a key for 'segmentsSkipped' if needed
+                    statusArea.style.color = 'orange';
+                } else {
+                    statusArea.textContent = getString('statusImported', {count: imported.length});
+                }
+                renderMarkedSegmentsList(); renderTimelineMarkers(); updateGlobalActionButtons();
+            } catch (err) {
+                statusArea.textContent = getString('statusErrorPrefix', { error: err.message });
+                statusArea.style.color = 'red';
+            } finally {
+                importSegmentsInput.value = ''; // Reset file input
+            }
+        };
+        reader.readAsText(file);
+    });
 
 
     // --- Segment Generation Logic (Mostly unchanged from v2.1) ---
-    cancelCurrentOperationButton.addEventListener('click', () => { /* ... (unchanged from v2.1) ... */ });
-    async function generateSingleSegment(segmentId) { /* ... (unchanged from v2.1) ... */ }
-    function finishSegmentGeneration(segment, blob, errorMessage) { /* ... (unchanged from v2.1) ... */ }
-    generateAllMarkedButton.addEventListener('click', async () => { /* ... (unchanged from v2.1) ... */ });
+    cancelCurrentOperationButton.addEventListener('click', () => {
+        operationCancelled = true;
+        if (currentGeneratingSegmentId) {
+            const segment = markedSegments.find(s => s.id === currentGeneratingSegmentId);
+            if (segment) {
+                segment.status = 'cancelled';
+                updateSegmentDisplay(segment.id);
+            }
+        }
+        if (zipWorker) { // If zipping
+            zipWorker.terminate();
+            zipWorker = setupZipWorker(); // Reinitialize worker
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            progressBarContainer.style.display = 'none';
+            statusArea.textContent = getString('statusZipCancelled') || "ZIP generation cancelled."; // Add statusZipCancelled key
+        }
+        cancelCurrentOperationButton.style.display = 'none';
+        currentGeneratingSegmentId = null;
+        console.log("Operation cancelled by user.");
+    });
+
+    async function generateSingleSegment(segmentId) {
+        if (!videoFile || !isCaptureStreamSupported || !isMediaRecorderSupported) return;
+        const segment = markedSegments.find(s => s.id === segmentId);
+        if (!segment || segment.status === 'generating' || segment.status === 'generated') return;
+
+        operationCancelled = false;
+        currentGeneratingSegmentId = segment.id;
+        segment.status = 'generating';
+        updateSegmentDisplay(segment.id);
+        cancelCurrentOperationButton.style.display = 'block';
+        progressBarContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        progressBar.style.backgroundColor = '#007bff'; // Reset color
+
+        const segmentNumberForStatus = markedSegments.indexOf(segment) + 1;
+        statusArea.textContent = getString('statusGeneratingSegment', { segmentNumber: segmentNumberForStatus, startTime: formatTime(segment.startTime), endTime: formatTime(segment.endTime) });
+
+        try {
+            const duration = segment.endTime - segment.startTime;
+            const stream = audioOnlyModeCheckbox.checked ?
+                new MediaStream(sourceVideo.captureStream().getAudioTracks()) :
+                sourceVideo.captureStream();
+
+            const recordedBlob = await recordSegmentInternal(segment.startTime, duration, originalMimeType, audioOnlyModeCheckbox.checked);
+
+            if (operationCancelled) {
+                finishSegmentGeneration(segment, null, getString('segmentStatusCancelled'));
+                return;
+            }
+            finishSegmentGeneration(segment, recordedBlob, null);
+
+        } catch (error) {
+            console.error('Error during segment generation:', error);
+            finishSegmentGeneration(segment, null, error.message || (getString('segmentStatusFailed')));
+        } finally {
+            if (currentGeneratingSegmentId === segment.id) { // Only reset if this was the one being processed
+                currentGeneratingSegmentId = null;
+                // Hide cancel button ONLY if no other segments are queued up for 'generateAll'
+                if (!markedSegments.some(s => s.status === 'generating')) {
+                    cancelCurrentOperationButton.style.display = 'none';
+                }
+                 // Hide progress bar if this was the last segment or cancelled.
+                if (progressBar.textContent.includes('100%') || segment.status === 'failed' || segment.status === 'cancelled') {
+                     setTimeout(() => { // Brief delay before hiding progress for completed/failed
+                        progressBarContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                        progressBar.textContent = '0%';
+                    }, 2000);
+                }
+            }
+        }
+    }
+
+    function finishSegmentGeneration(segment, blob, errorMessage) {
+        if (!segment) return;
+        if (operationCancelled && segment.status !== 'cancelled') { // If cancelled during recording but before this func
+            segment.status = 'cancelled';
+        } else if (errorMessage) {
+            segment.status = 'failed';
+            segment.error = errorMessage;
+            progressBar.style.backgroundColor = '#dc3545';
+            progressBar.textContent = getString('segmentStatusFailed');
+        } else if (blob) {
+            segment.status = 'generated';
+            segment.blob = blob;
+            segment.blobUrl = URL.createObjectURL(blob);
+            allObjectUrls.push(segment.blobUrl);
+            const prefix = fileNamePrefixInput.value || 'segment';
+            const originalName = videoFile.name.substring(0, videoFile.name.lastIndexOf('.')) || videoFile.name;
+            const segmentIndex = markedSegments.indexOf(segment) + 1;
+            const ext = audioOnlyModeCheckbox.checked ? (originalMimeType.includes('mp4') ? 'm4a' : 'ogg') : (originalMimeType.split('/')[1] || 'webm');
+            segment.fileName = `${prefix}_${originalName}_${segmentIndex}_${formatTime(segment.startTime).replace(/[:.]/g, '')}-${formatTime(segment.endTime).replace(/[:.]/g, '')}.${ext}`;
+            generatedBlobsForZip.push({ name: segment.fileName, blob: segment.blob });
+            progressBar.textContent = '100%'; // For single generation
+        }
+        updateSegmentDisplay(segment.id);
+        updateGlobalActionButtons();
+        if (segment.status === 'generated') {
+             statusArea.textContent = getString('statusSegmentGeneratedSuccessfully', { segmentNumber: markedSegments.indexOf(segment) + 1, fileName: segment.fileName });
+        } else if (segment.status === 'failed') {
+            statusArea.textContent = getString('statusSegmentGenerationFailed', { segmentNumber: markedSegments.indexOf(segment) + 1, error: segment.error });
+        }
+    }
+
+    generateAllMarkedButton.addEventListener('click', async () => {
+        if (!videoFile || !isCaptureStreamSupported || !isMediaRecorderSupported) return;
+        operationCancelled = false;
+        cancelCurrentOperationButton.style.display = 'block';
+        progressBarContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        progressBar.style.backgroundColor = '#007bff';
+
+        const segmentsToGenerate = markedSegments.filter(s => s.status === 'marked' || s.status === 'failed' || s.status === 'cancelled');
+        if (segmentsToGenerate.length === 0) {
+            cancelCurrentOperationButton.style.display = 'none';
+            progressBarContainer.style.display = 'none';
+            return;
+        }
+
+        let generatedCount = 0;
+        for (let i = 0; i < segmentsToGenerate.length; i++) {
+            if (operationCancelled) {
+                statusArea.textContent = getString('statusAllGenerationCancelled') || "Generation of all segments cancelled."; // Add key
+                break;
+            }
+            const segment = segmentsToGenerate[i];
+            currentGeneratingSegmentId = segment.id; // Set for cancellation tracking
+            segment.status = 'generating';
+            updateSegmentDisplay(segment.id);
+
+            const overallProgress = Math.round(((i) / segmentsToGenerate.length) * 100);
+            progressBar.style.width = `${overallProgress}%`;
+            progressBar.textContent = `${overallProgress}%`;
+
+            const segmentNumberForStatus = markedSegments.indexOf(segment) + 1;
+            statusArea.textContent = getString('statusGeneratingSegment', { segmentNumber: segmentNumberForStatus, startTime: formatTime(segment.startTime), endTime: formatTime(segment.endTime) });
+
+            try {
+                const duration = segment.endTime - segment.startTime;
+                 const stream = audioOnlyModeCheckbox.checked ?
+                    new MediaStream(sourceVideo.captureStream().getAudioTracks()) :
+                    sourceVideo.captureStream();
+                const recordedBlob = await recordSegmentInternal(segment.startTime, duration, originalMimeType, audioOnlyModeCheckbox.checked);
+
+                if (operationCancelled) { // Check again after await
+                    segment.status = 'cancelled'; // Mark this one as cancelled
+                    updateSegmentDisplay(segment.id);
+                    // No explicit message here, loop will break or continue to next if desired
+                    continue; // Or break, depending on desired cancel behavior for "all"
+                }
+                finishSegmentGeneration(segment, recordedBlob, null);
+                if(segment.status === 'generated') generatedCount++;
+
+            } catch (error) {
+                console.error('Error during segment generation (all):', error);
+                finishSegmentGeneration(segment, null, error.message || (getString('segmentStatusFailed')));
+            }
+        }
+        currentGeneratingSegmentId = null; // Clear after loop
+        cancelCurrentOperationButton.style.display = 'none';
+        progressBar.style.width = '100%';
+        progressBar.textContent = '100%';
+        statusArea.textContent = getString('statusAllSegmentsGenerated');
+        setTimeout(() => {
+            progressBarContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        }, 2000);
+    });
     function recordSegmentInternal(startTime, duration, mimeType, isAudioOnly) { /* ... (Unchanged from v2.1) ... */ }
 
 
     // --- ZIP Download (with Web Worker - unchanged from v2.1) ---
-    function setupZipWorker() { /* ... (Unchanged from v2.1) ... */ }
+    function setupZipWorker() {
+        if (!areWebWorkersSupported) return null;
+        try {
+            // Inlined worker code
+            const workerCode = `
+                self.importScripts('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+                self.onmessage = (e) => {
+                    const { id, segments } = e.data;
+                    const zip = new JSZip();
+                    segments.forEach(segment => {
+                        zip.file(segment.name, segment.blob);
+                    });
+                    zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } }, (metadata) => {
+                        self.postMessage({ type: 'progress', id: id, percent: metadata.percent });
+                    })
+                    .then((content) => {
+                        self.postMessage({ type: 'result', id: id, blob: content });
+                    })
+                    .catch(err => {
+                        self.postMessage({ type: 'error', id: id, error: err.message });
+                    });
+                };
+            `;
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const worker = new Worker(URL.createObjectURL(blob));
+            allObjectUrls.push(URL.createObjectURL(blob)); // Track for cleanup
+            return worker;
+        } catch (e) {
+            console.error("Error setting up Zip Worker:", e);
+            return null;
+        }
+    }
     zipWorker = setupZipWorker();
-    downloadAllGeneratedButton.addEventListener('click', async () => { /* ... (Unchanged from v2.1) ... */ });
-    async function zipOnMainThread(segmentsToZip) { /* ... (Unchanged from v2.1) ... */ }
-    function finishZipOperation() { /* ... (Unchanged from v2.1) ... */ }
+
+    downloadAllGeneratedButton.addEventListener('click', async () => {
+        const segmentsToZip = generatedBlobsForZip.filter(item => item.blob && item.blob.size > 0);
+        if (segmentsToZip.length === 0) return;
+
+        operationCancelled = false; // Reset cancellation flag for zipping
+        cancelCurrentOperationButton.style.display = 'block'; // Show cancel button for zipping
+        progressBarContainer.style.display = 'block';
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        progressBar.style.backgroundColor = '#17a2b8'; // Different color for zipping
+        statusArea.textContent = getString('statusZipping', { count: segmentsToZip.length });
+
+        const zipFileName = `${fileNamePrefixInput.value || 'segments'}_${videoFile ? (videoFile.name.substring(0, videoFile.name.lastIndexOf('.')) || videoFile.name) : 'all'}_${new Date().toISOString().slice(0,10)}.zip`;
+
+        if (zipWorker && areWebWorkersSupported) {
+            const zipJobId = Date.now();
+            zipWorker.postMessage({ id: zipJobId, segments: segmentsToZip });
+            zipWorker.onmessage = (e) => {
+                if (e.data.id !== zipJobId) return; // Message from an old job
+
+                if (operationCancelled) { // Check if cancel was clicked during worker operation
+                    // Worker might still finish, but we ignore its result
+                    progressBar.style.width = '0%'; progressBar.textContent = '0%';
+                    progressBarContainer.style.display = 'none';
+                    statusArea.textContent = getString('statusZipCancelled') || "ZIP generation cancelled.";
+                    cancelCurrentOperationButton.style.display = 'none';
+                    return; // Stop processing messages for this cancelled job
+                }
+
+                if (e.data.type === 'progress') {
+                    progressBar.style.width = `${e.data.percent.toFixed(0)}%`;
+                    progressBar.textContent = `${e.data.percent.toFixed(0)}%`;
+                } else if (e.data.type === 'result') {
+                    const url = URL.createObjectURL(e.data.blob); allObjectUrls.push(url);
+                    const a = document.createElement('a'); a.href = url; a.download = zipFileName;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                    statusArea.textContent = getString('statusZipReady', { fileName: zipFileName });
+                    finishZipOperation();
+                } else if (e.data.type === 'error') {
+                    statusArea.textContent = getString('statusZipFailed', { error: e.data.error });
+                    console.error("Zip Worker Error:", e.data.error);
+                    finishZipOperation(true);
+                }
+            };
+        } else { // Fallback to main thread zipping
+            try {
+                const blob = await zipOnMainThread(segmentsToZip); // zipOnMainThread will update progress internally
+                const url = URL.createObjectURL(blob); allObjectUrls.push(url);
+                const a = document.createElement('a'); a.href = url; a.download = zipFileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                statusArea.textContent = getString('statusZipReady', { fileName: zipFileName });
+            } catch (err) {
+                statusArea.textContent = getString('statusZipFailed', { error: err.message });
+            } finally {
+                finishZipOperation();
+            }
+        }
+    });
+
+    async function zipOnMainThread(segmentsToZip) {
+        const zip = new JSZip();
+        segmentsToZip.forEach(segment => {
+            zip.file(segment.name, segment.blob);
+        });
+        return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: {level: 6} }, (metadata) => {
+            // Update progress for main thread zipping
+            if (!operationCancelled) {
+                 progressBar.style.width = `${metadata.percent.toFixed(0)}%`;
+                 progressBar.textContent = `${metadata.percent.toFixed(0)}%`;
+            } else {
+                // If operation was cancelled, we should ideally stop generation.
+                // JSZip doesn't have a direct cancel for generateAsync once started.
+                // We can only prevent UI updates and ignore the result.
+                throw new Error(getString('statusZipCancelled') || "ZIP generation cancelled.");
+            }
+        });
+    }
+
+    function finishZipOperation(isError = false) {
+        if (!isError) {
+            progressBar.style.width = '100%'; progressBar.textContent = '100%';
+        } else {
+            progressBar.style.backgroundColor = '#dc3545'; // Error color
+        }
+        setTimeout(() => {
+            progressBarContainer.style.display = 'none';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+        }, 2000);
+        cancelCurrentOperationButton.style.display = 'none'; // Hide cancel button after zipping is done or failed
+        operationCancelled = false; // Reset for next operation
+    }
 
 
     // --- NEW: Keyboard Shortcuts ---
     document.addEventListener('keydown', (e) => {
-        // عمومی طور پر ان پٹ فیلڈز میں ٹائپ کرتے وقت شارٹ کٹس کو نظر انداز کریں
         const targetTagName = e.target.tagName.toLowerCase();
         const isEditingText = targetTagName === 'input' || targetTagName === 'textarea';
         const isSegmentTimeInputFocused = e.target.closest('.segment-inputs') && e.target.type === 'number';
 
-
-        // Spacebar for Play/Pause (if not typing in a general text field)
         if (e.code === 'Space' && !isEditingText) {
             e.preventDefault();
-            if (sourceVideo.src) { // Only if video is loaded
-                playPauseBtn.click();
-            }
+            if (sourceVideo.src) playPauseBtn.click();
         }
 
-        // Escape to cancel current operation
         if (e.key === 'Escape') {
-            if (!cancelCurrentOperationButton.disabled && cancelCurrentOperationButton.style.display !== 'none') {
+            if (cancelCurrentOperationButton.style.display !== 'none' && !cancelCurrentOperationButton.disabled) {
                 e.preventDefault();
-                cancelCurrentOperationButton.click();
-            } else if (editingSegmentId) { // If editing a segment, Esc cancels edit
+                // Confirm before cancelling if it's a "generate all" or "zip"
+                if (confirm(getString('confirmCancelOperation'))) {
+                    cancelCurrentOperationButton.click();
+                }
+            } else if (editingSegmentId) {
                 e.preventDefault();
                 toggleSegmentEdit(editingSegmentId, false);
             }
         }
 
-        // Shortcuts that should not work while editing segment times specifically
         if (isSegmentTimeInputFocused) {
-             // Enter key within segment time inputs should save that segment
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const segmentItem = e.target.closest('.segment-item');
@@ -542,61 +1217,69 @@
                     saveButton?.click();
                 }
             }
-            return; // Don't process other general shortcuts if focused on segment time input
+            return;
         }
 
+        if (isEditingText && !isSegmentTimeInputFocused) return;
 
-        if (isEditingText && !isSegmentTimeInputFocused) return; // Ignore other shortcuts if in other input fields
-
-        // Modifier keys (Cmd for macOS, Ctrl for others)
         const modKey = e.metaKey || e.ctrlKey;
 
-        if (modKey && e.key.toLowerCase() === 's') { // Cmd/Ctrl + S to Export
+        if (modKey && e.key.toLowerCase() === 's') {
             e.preventDefault();
             if (!exportSegmentsButton.disabled) exportSegmentsButton.click();
         }
-        if (modKey && e.key.toLowerCase() === 'o') { // Cmd/Ctrl + O to trigger Import click
+        if (modKey && e.key.toLowerCase() === 'o') {
             e.preventDefault();
-            // Find the label associated with importSegmentsInput and click it
             const importLabel = document.querySelector(`label[for="${importSegmentsInput.id}"]`);
             importLabel?.click();
-             // If no label, directly click the input (though it's hidden, label click is better)
             if (!importLabel) importSegmentsInput.click();
         }
 
-
-        // Mode-specific or general action shortcuts (no modifier key)
         switch (e.key.toLowerCase()) {
-            case 'm': // Mark in Sequential Mode
+            case 'm':
                 if (currentSplitMode === 'sequentialModeTab' && !markSequentialSplitPointButton.disabled) {
-                    e.preventDefault();
-                    markSequentialSplitPointButton.click();
+                    e.preventDefault(); markSequentialSplitPointButton.click();
                 }
                 break;
-            case 'n': // New segment in Free Mode
+            case 'n':
                 if (currentSplitMode === 'freeModeTab' && !addFreeSegmentButton.disabled) {
-                    e.preventDefault();
-                    addFreeSegmentButton.click();
+                    e.preventDefault(); addFreeSegmentButton.click();
                 }
                 break;
-            case 'o': // Toggle Audio Only Mode
+            case 'o':
                  e.preventDefault();
                  audioOnlyModeCheckbox.checked = !audioOnlyModeCheckbox.checked;
-                 // Manually trigger change event if needed for other logic, or save settings directly
-                 saveAppSettings();
-                 statusArea.textContent = `音声のみモードが${audioOnlyModeCheckbox.checked ? 'オン' : 'オフ'}になりました。`;
+                 saveAppSettings(); // Save immediately
+                 statusArea.textContent = getString(audioOnlyModeCheckbox.checked ? 'statusAudioModeOn' : 'statusAudioModeOff');
                 break;
-            // Add more shortcuts as needed, e.g., for generating selected segment, navigating tabs, etc.
         }
     });
 
 
     // --- Cleanup on Page Unload ---
-    window.addEventListener('beforeunload', () => { /* ... (unchanged) ... */
+    window.addEventListener('beforeunload', () => {
         allObjectUrls.forEach(url => URL.revokeObjectURL(url));
         if (zipWorker) zipWorker.terminate();
     });
 
+    // Helper to update a segment's display in the list (e.g., status change)
+    function updateSegmentDisplay(segmentId) {
+        const segment = markedSegments.find(s => s.id === segmentId);
+        if (!segment) return;
+
+        const itemDiv = markedSegmentsListDiv.querySelector(`.segment-item[data-segment-id="${segmentId}"]`);
+        if (!itemDiv) return;
+
+        const infoSpan = itemDiv.querySelector('.segment-info');
+        const actionsDiv = itemDiv.querySelector('.segment-actions');
+
+        if (infoSpan && actionsDiv) {
+            // Simplified: Re-render the whole list for now.
+            // For more granular updates, one would update specific parts of the itemDiv.
+            renderMarkedSegmentsList();
+            renderTimelineMarkers(); // Also update timeline markers as status might change color
+        }
+    }
 </script>
 </body>
 </html>
