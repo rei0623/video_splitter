@@ -2,7 +2,7 @@ const uiStrings = {
   ja: {
     // From HTML
     pageTitle: "多機能動画分割ツール v2.6 (ショートカット&スクロール対応)",
-    mainHeading: "多機能動画分割ツール v2.2",
+    mainHeading: "多機能動画分割ツール v2.6",
     fileDropAreaText: "ここに動画/音声ファイルをドラッグ＆ドロップ、またはクリックして選択",
     playButton: "再生",
     playPauseButtonTitle: "再生/一時停止 (Space)",
@@ -100,12 +100,17 @@ const uiStrings = {
     statusZipping: "ZIPファイルを生成中... (%count%個のファイル)",
     statusZipReady: "ZIPファイルの準備ができました: %fileName%",
     statusZipFailed: "ZIPファイルの生成に失敗しました: %error%",
-    confirmCancelOperation: "現在の操作をキャンセルしてもよろしいですか？"
+    confirmCancelOperation: "現在の操作をキャンセルしてもよろしいですか？",
+    deleteAllSegmentsButtonCaption: "全セグメント削除",
+    deleteAllSegmentsButtonTitle: "リスト内の全てのマーク済みセグメントを削除します",
+    confirmDeleteAllSegments: "本当に全てのセグメントを削除してもよろしいですか？この操作は元に戻せません。",
+    statusNoSegmentsToDelete: "削除するセグメントがありません。",
+    statusAllSegmentsDeleted: "全てのセグメントが削除されました。"
   },
   en: {
     // From HTML
     pageTitle: "Multifunctional Video Splitter v2.6 (Shortcut & Scroll Support)",
-    mainHeading: "Multifunctional Video Splitter v2.2",
+    mainHeading: "Multifunctional Video Splitter v2.6",
     fileDropAreaText: "Drag & drop video/audio files here, or click to select",
     playButton: "Play",
     playPauseButtonTitle: "Play/Pause (Space)",
@@ -203,6 +208,11 @@ const uiStrings = {
     statusZipping: "Generating ZIP file... (%count% files)",
     statusZipReady: "ZIP file ready: %fileName%",
     statusZipFailed: "Failed to generate ZIP file: %error%",
-    confirmCancelOperation: "Are you sure you want to cancel the current operation?"
+    confirmCancelOperation: "Are you sure you want to cancel the current operation?",
+    deleteAllSegmentsButtonCaption": "Delete All Segments",
+    deleteAllSegmentsButtonTitle": "Deletes all marked segments from the list",
+    confirmDeleteAllSegments": "Are you sure you want to delete all segments? This action cannot be undone.",
+    statusNoSegmentsToDelete": "There are no segments to delete.",
+    statusAllSegmentsDeleted": "All segments have been deleted."
   }
 };

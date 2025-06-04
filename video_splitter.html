@@ -105,7 +105,7 @@
         <option value="en" data-lang-key="langOptionEnglish">English</option>
       </select>
     </div>
-    <h1 data-lang-key="mainHeading">多機能動画分割ツール v2.2</h1>
+    <h1 data-lang-key="mainHeading">多機能動画分割ツール v2.6</h1>
 
     <div id="fileDropArea" class="file-drop-area" data-lang-key="fileDropAreaText">
         ここに動画/音声ファイルをドラッグ＆ドロップ、またはクリックして選択
@@ -180,7 +180,7 @@
     <button id="downloadAllGeneratedButton" style="display: none; background-color: #17a2b8;" data-lang-key="downloadAllGeneratedButtonCaption" data-lang-title-key="downloadAllGeneratedButtonTitle" title="生成済の全セグメントをZIPでダウンロード">生成済全セグメントをZIPでダウンロード</button>
     <button id="cancelCurrentOperationButton" style="display: none; background-color: #dc3545;" data-lang-key="cancelCurrentOperationButtonCaption" data-lang-title-key="cancelCurrentOperationButtonTitle" title="現在の生成/圧縮処理をキャンセル (Esc)">現在の操作をキャンセル</button>
 
-    <div id="statusArea" data-lang-key="statusInitial">ステータス: 動画ファイルを選択してください。</div>
+    <div id="statusArea" data-lang-key="statusInitial" aria-live="polite">ステータス: 動画ファイルを選択してください。</div>
     <div id="progressBarContainer">
         <div id="progressBar">0%</div>
     </div>
@@ -300,6 +300,7 @@
     const exportSegmentsButton = document.getElementById('exportSegmentsButton');
     const importSegmentsInput = document.getElementById('importSegmentsInput');
     const languageSelector = document.getElementById('languageSelector');
+    const deleteAllSegmentsButton = document.getElementById('deleteAllSegmentsButton');
 
 
     // --- Global State ---
@@ -316,6 +317,10 @@
     let zipWorker = null;
     let isSeekBarDragging = false;
     let previewStopTimeout = null; // For stopping segment preview
+
+    // --- Global Variables for Marker Drag State ---
+    let isDraggingMarker = false;
+    let draggedMarkerInfo = { segmentId: null, type: null, originalStartTime: 0, originalEndTime: 0 };
 
 
     // --- Feature Detection & Settings (Mostly unchanged) ---
@@ -431,17 +436,39 @@
             statusArea.textContent = getString('statusInitial');
             fileDropArea.textContent = getString('fileDropAreaText');
         }
+        deleteAllSegmentsButton.disabled = true;
     }
-    function updateUIForFileLoaded() { /* ... (unchanged) ... */ markSequentialSplitPointButton.disabled = false; addFreeSegmentButton.disabled = false; previewFixedLengthSegmentsButton.disabled = false; exportSegmentsButton.disabled = false; }
-    function disableCoreFunctionality() { /* ... (unchanged) ... */ markSequentialSplitPointButton.disabled = true; addFreeSegmentButton.disabled = true; previewFixedLengthSegmentsButton.disabled = true; exportSegmentsButton.disabled = true; generateAllMarkedButton.style.display = 'none'; downloadAllGeneratedButton.style.display = 'none'; }
+    function updateUIForFileLoaded() {
+        markSequentialSplitPointButton.disabled = false;
+        addFreeSegmentButton.disabled = false;
+        previewFixedLengthSegmentsButton.disabled = false;
+        exportSegmentsButton.disabled = false;
+        deleteAllSegmentsButton.disabled = false; // Enable when file is loaded, updateGlobalActionButtons will manage based on segments
+    }
+    function disableCoreFunctionality() { /* ... (unchanged) ... */
+        markSequentialSplitPointButton.disabled = true;
+        addFreeSegmentButton.disabled = true;
+        previewFixedLengthSegmentsButton.disabled = true;
+        exportSegmentsButton.disabled = true;
+        deleteAllSegmentsButton.disabled = true;
+        generateAllMarkedButton.style.display = 'none';
+        downloadAllGeneratedButton.style.display = 'none';
+    }
 
     // --- Custom Video Controls & Timeline (Mostly unchanged from v2.1) ---
     playPauseBtn.addEventListener('click', () => { if (sourceVideo.paused || sourceVideo.ended) sourceVideo.play(); else sourceVideo.pause(); });
     seekBar.addEventListener('input', () => { isSeekBarDragging = true; currentTimeDisplay.textContent = formatTime(seekBar.value); updateTimelineProgress(parseFloat(seekBar.value)); });
     seekBar.addEventListener('change', () => { isSeekBarDragging = false; sourceVideo.currentTime = seekBar.value; });
-    timelineContainer.addEventListener('click', (e) => { if (!videoDuration || e.target.classList.contains('timeline-marker')) return; const rect = timelineContainer.getBoundingClientRect(); const clickX = e.clientX - rect.left; const percentage = clickX / rect.width; sourceVideo.currentTime = videoDuration * percentage; });
-    timelineContainer.addEventListener('mousemove', (e) => {
+    timelineContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('timeline-marker') || e.target.closest('.timeline-marker')) return;
         if (!videoDuration) return;
+        const rect = timelineContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percentage = clickX / rect.width;
+        sourceVideo.currentTime = videoDuration * percentage;
+    });
+    timelineContainer.addEventListener('mousemove', (e) => {
+        if (!videoDuration || isDraggingMarker) return; // Do not show tooltip when dragging
         const rect = timelineContainer.getBoundingClientRect();
         const hoverX = e.clientX - rect.left;
         const percentage = hoverX / rect.width;
@@ -484,18 +511,28 @@
             startMarker.className = 'timeline-marker';
             startMarker.style.left = `${(segment.startTime / videoDuration) * 100}%`;
             startMarker.title = getString('timelineMarkerStartTimeTitle', { time: formatTime(segment.startTime) });
+            startMarker.dataset.markerType = 'start';
+            startMarker.dataset.segmentId = segment.id;
             if (isEditingThis) startMarker.classList.add('editing-start');
             else if (segment.status === 'generated') startMarker.style.backgroundColor = '#28a745';
             else if (segment.status === 'failed') startMarker.style.backgroundColor = '#dc3545';
+            if (currentSplitMode === 'freeModeTab') {
+                startMarker.addEventListener('mousedown', handleMarkerMouseDown);
+            }
             timelineContainer.appendChild(startMarker);
 
             const endMarker = document.createElement('div');
             endMarker.className = 'timeline-marker';
             endMarker.style.left = `${(segment.endTime / videoDuration) * 100}%`;
             endMarker.title = getString('timelineMarkerEndTimeTitle', { time: formatTime(segment.endTime) });
+            endMarker.dataset.markerType = 'end';
+            endMarker.dataset.segmentId = segment.id;
             if (isEditingThis) endMarker.classList.add('editing-end');
             else if (segment.status === 'generated') endMarker.style.backgroundColor = '#28a745';
             else if (segment.status === 'failed') endMarker.style.backgroundColor = '#dc3545';
+            if (currentSplitMode === 'freeModeTab') {
+                endMarker.addEventListener('mousedown', handleMarkerMouseDown);
+            }
             timelineContainer.appendChild(endMarker);
 
             const rangeDiv = document.createElement('div');
@@ -513,7 +550,139 @@
 
     // --- Tab/Mode Switching Logic (Mostly unchanged from v2.1) ---
     tabs.forEach(tab => { tab.addEventListener('click', () => { setActiveTab(tab.dataset.tab); if (editingSegmentId) { toggleSegmentEdit(editingSegmentId, false); editingSegmentId = null; } }); });
-    function setActiveTab(tabId, doSaveSettings = true) { /* ... (unchanged from v2.1) ... */ tabs.forEach(t => t.classList.remove('active')); tabContents.forEach(tc => tc.classList.remove('active')); const activeTabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`); const activeTabContent = document.getElementById(tabId); if (activeTabButton) activeTabButton.classList.add('active'); if (activeTabContent) activeTabContent.classList.add('active'); currentSplitMode = tabId; if(doSaveSettings) saveAppSettings(); }
+    function setActiveTab(tabId, doSaveSettings = true) {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        const activeTabButton = document.querySelector(`.tab-button[data-tab="${tabId}"]`);
+        const activeTabContent = document.getElementById(tabId);
+        if (activeTabButton) activeTabButton.classList.add('active');
+        if (activeTabContent) activeTabContent.classList.add('active');
+        currentSplitMode = tabId;
+        if(doSaveSettings) saveAppSettings();
+        renderTimelineMarkers(); // Re-render markers to add/remove event listeners based on mode
+    }
+
+
+    // --- Draggable Marker Handlers ---
+    function handleMarkerMouseDown(event) {
+        event.preventDefault();
+        if (currentSplitMode !== 'freeModeTab' || !sourceVideo.src || !videoFile) return;
+        isDraggingMarker = true;
+        const segmentId = parseInt(event.target.dataset.segmentId);
+        const markerType = event.target.dataset.markerType;
+        const segment = markedSegments.find(s => s.id === segmentId);
+        if (!segment) { isDraggingMarker = false; return; }
+
+        draggedMarkerInfo = { segmentId: segment.id, type: markerType, originalStartTime: segment.startTime, originalEndTime: segment.endTime };
+
+        // Ensure segment is in edit mode. If not already editing this segment, toggle it.
+        // If already editing this segment but clicked another marker of the same segment, it's fine.
+        if (editingSegmentId !== segment.id) {
+            toggleSegmentEdit(segment.id, true); // This will call renderMarkedSegmentsList and renderTimelineMarkers
+        } else {
+            // If already editing this segment, ensure visual cues are correct
+            renderTimelineMarkers(); // Re-render to ensure correct styling on markers
+        }
+
+        document.addEventListener('mousemove', handleMarkerDrag);
+        document.addEventListener('mouseup', handleMarkerMouseUp);
+        document.body.style.cursor = 'ew-resize';
+        timelineTooltip.style.display = 'none'; // Hide tooltip during drag
+    }
+
+    function handleMarkerDrag(event) {
+        if (!isDraggingMarker) return;
+        event.preventDefault();
+        const rect = timelineContainer.getBoundingClientRect();
+        let mouseX = event.clientX - rect.left;
+        mouseX = Math.max(0, Math.min(mouseX, rect.width)); // Clamp mouseX within timeline bounds
+        let newTime = (mouseX / rect.width) * videoDuration;
+
+        const segment = markedSegments.find(s => s.id === draggedMarkerInfo.segmentId);
+        if (!segment) return;
+
+        let tempStartTime = segment.startTime;
+        let tempEndTime = segment.endTime;
+        const minSegmentDuration = 0.05; // 50ms minimum duration
+
+        if (draggedMarkerInfo.type === 'start') {
+            tempStartTime = Math.max(0, Math.min(newTime, draggedMarkerInfo.originalEndTime - minSegmentDuration));
+        } else { // type === 'end'
+            tempEndTime = Math.min(videoDuration, Math.max(newTime, draggedMarkerInfo.originalStartTime + minSegmentDuration));
+        }
+
+        renderTimelineMarkersWithEdit(draggedMarkerInfo.segmentId, tempStartTime, tempEndTime);
+
+        const segmentItemDiv = markedSegmentsListDiv.querySelector(`.segment-item[data-segment-id="${draggedMarkerInfo.segmentId}"]`);
+        if (segmentItemDiv) {
+            const startInput = segmentItemDiv.querySelector('input[data-time-type="start"]');
+            const endInput = segmentItemDiv.querySelector('input[data-time-type="end"]');
+            if (startInput) startInput.value = tempStartTime.toFixed(3); // Always update start for visual sync
+            if (endInput) endInput.value = tempEndTime.toFixed(3);   // Always update end for visual sync
+        }
+    }
+
+    function handleMarkerMouseUp(event) {
+        if (!isDraggingMarker) return;
+        event.preventDefault();
+        document.removeEventListener('mousemove', handleMarkerDrag);
+        document.removeEventListener('mouseup', handleMarkerMouseUp);
+        document.body.style.cursor = 'default';
+
+        const segment = markedSegments.find(s => s.id === draggedMarkerInfo.segmentId);
+        if (!segment) { isDraggingMarker = false; return; }
+
+        const rect = timelineContainer.getBoundingClientRect();
+        let mouseX = event.clientX - rect.left;
+        mouseX = Math.max(0, Math.min(mouseX, rect.width)); // Clamp mouseX
+        let finalTime = (mouseX / rect.width) * videoDuration;
+
+        let newSegmentData = { ...segment }; // Clone to modify
+        const minSegmentDuration = 0.05;
+
+        if (draggedMarkerInfo.type === 'start') {
+            newSegmentData.startTime = Math.max(0, Math.min(finalTime, draggedMarkerInfo.originalEndTime - minSegmentDuration));
+            newSegmentData.endTime = draggedMarkerInfo.originalEndTime; // Keep original end time unless it's violated
+        } else { // type === 'end'
+            newSegmentData.endTime = Math.min(videoDuration, Math.max(finalTime, draggedMarkerInfo.originalStartTime + minSegmentDuration));
+            newSegmentData.startTime = draggedMarkerInfo.originalStartTime; // Keep original start time unless it's violated
+        }
+
+        // Final validation for the updated segment times
+        if (newSegmentData.startTime >= newSegmentData.endTime) {
+            // If times are invalid (e.g. start crossed end), revert to original times of THIS drag operation
+            newSegmentData.startTime = draggedMarkerInfo.originalStartTime;
+            newSegmentData.endTime = draggedMarkerInfo.originalEndTime;
+            statusArea.textContent = getString('errorEndTimeBeforeStartTime');
+            statusArea.style.color = 'orange';
+            // Update inputs back to original drag values if they were changed
+            const segmentItemDiv = markedSegmentsListDiv.querySelector(`.segment-item[data-segment-id="${draggedMarkerInfo.segmentId}"]`);
+            if (segmentItemDiv) {
+                 const startInput = segmentItemDiv.querySelector('input[data-time-type="start"]');
+                 const endInput = segmentItemDiv.querySelector('input[data-time-type="end"]');
+                 if (startInput) startInput.value = newSegmentData.startTime.toFixed(3);
+                 if (endInput) endInput.value = newSegmentData.endTime.toFixed(3);
+            }
+        }
+
+        isDraggingMarker = false;
+        // The addOrUpdateSegment will handle validation, sorting, and re-rendering.
+        // It also handles exiting edit mode if the update is successful.
+        const updateSucceeded = addOrUpdateSegment(newSegmentData, false);
+
+        if (!updateSucceeded) {
+            // If update failed (e.g. validation error in addOrUpdateSegment),
+            // we might want to revert to original pre-drag state or just re-render.
+            // For now, addOrUpdateSegment handles showing the error.
+            // We should ensure the segment exits edit mode if the user clicks away or something.
+            // However, since the user was dragging, they might want to correct via inputs, so keep edit mode.
+            renderMarkedSegmentsList(); // Re-render to reflect current (possibly invalid) input values
+            renderTimelineMarkers();    // And timeline markers
+        }
+        // editingSegmentId is reset in addOrUpdateSegment if successful.
+        // If not successful, it remains in edit mode, which is often desired.
+        draggedMarkerInfo = { segmentId: null, type: null, originalStartTime: 0, originalEndTime: 0 };
+    }
 
     // --- Segment Management Core (Mostly unchanged from v2.1) ---
     function addOrUpdateSegment(segmentData, isNew = true) {
@@ -812,6 +981,38 @@
         generateAllMarkedButton.style.display = hasMarked ? 'block' : 'none';
         downloadAllGeneratedButton.style.display = hasGenerated ? 'block' : 'none';
         exportSegmentsButton.disabled = markedSegments.length === 0;
+        if (deleteAllSegmentsButton) deleteAllSegmentsButton.disabled = markedSegments.length === 0;
+    }
+
+    // --- Delete All Segments ---
+    function handleDeleteAllSegments() {
+        if (markedSegments.length === 0) {
+            statusArea.textContent = getString('statusNoSegmentsToDelete');
+            statusArea.style.color = '#333';
+            return;
+        }
+        if (confirm(getString('confirmDeleteAllSegments'))) {
+            // Revoke object URLs for all segments
+            markedSegments.forEach(segment => {
+                if (segment.blobUrl) {
+                    URL.revokeObjectURL(segment.blobUrl);
+                    allObjectUrls = allObjectUrls.filter(url => url !== segment.blobUrl);
+                }
+            });
+            markedSegments = [];
+            generatedBlobsForZip = []; // Clear generated blobs as well
+            editingSegmentId = null;
+
+            renderMarkedSegmentsList();
+            renderTimelineMarkers();
+            updateGlobalActionButtons(); // This should hide 'Generate All' and 'Download All' and disable 'Delete All' & 'Export'
+
+            statusArea.textContent = getString('statusAllSegmentsDeleted');
+            statusArea.style.color = '#333';
+        }
+    }
+    if (deleteAllSegmentsButton) { // Ensure button exists before adding listener
+        deleteAllSegmentsButton.addEventListener('click', handleDeleteAllSegments);
     }
 
 
